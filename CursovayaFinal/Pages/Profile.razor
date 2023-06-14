@@ -1,0 +1,150 @@
+﻿@page "/Profile"
+@using CursovayaFinal.Models
+@using CursovayaFinal.Sercives
+@using System.Security.Claims;
+@using Microsoft.EntityFrameworkCore
+@inject ILocalStorageService _localStorage;
+@inject IAuthService authService;
+@inject AppDbContext _appDbContext;
+
+
+@if (_userInfo is not null)
+{
+	@*<h1>@_userInfo.Name</h1>
+		<h1>@_userInfo.Surname</h1>
+		<h1>@_userInfo.RoleId</h1>*@
+	<div class="d-flex justify-content-between">
+		<h3>Добро пожаловать, @_userInfo.Name @_userInfo.Surname</h3>
+		<a href="/Main">
+			<button class="CardButton" @onclick="Logouting" Match="NavLinkMatch.All">
+				Выйти
+			</button>
+		</a>
+	</div>
+	<hr class="hrProfile" />
+	<div class="d-flex">
+		<div class="d-flex flex-column">
+			<div class="MainText">
+				<div class="d-flex flex-column justify-content-center align-content-center">
+						<div class="MainText">Ваши мероприятия</div>
+					<div class="d-flex">
+						@foreach (var eventDu in _events)
+						{	
+							<div class="ProfileCards mb-4">
+								<div class="d-flex">
+									@if(eventDu.Name=="Кухня Народов")
+									{
+										<div>
+											<img class = "cardPhotoClass m-2" style="object-fit: cover" src="https://sun9-53.userapi.com/impg/otYD05pvhgQ4kOwFieMdPguJc94RhTsByNfBdw/ihH_FvsIb58.jpg?size=1276x956&quality=96&sign=09c71479746c26b60be61b9a9a807391&type=album">
+										</div>
+									}
+									@if(eventDu.Name=="Спартакиада")
+									{
+										<div>
+											<img class = "cardPhotoClass m-2" style="object-fit: cover" src="https://sun9-72.userapi.com/impg/5OFwPaaQzjkocMMOh_nDc3xBkVcry_jr0f9JWg/RZ1SyXzLUxc.jpg?size=2560x1920&quality=96&sign=62d83625747d2bb434ec78c43556c28f&type=album">
+										</div>
+									}
+									@if(eventDu.Name=="Благотворительная Акция")
+									{
+										<div>
+											<img class = "cardPhotoClass m-2" style="object-fit: cover" src="https://sun9-20.userapi.com/impg/H6gwIjho8nkYYQxjY4o2sk-J6ZOckIZ5YL7fhA/IDu03Xi1W08.jpg?size=1919x1280&quality=95&sign=ceae2bf8c88fe05e8cb49d72208a021d&type=album">
+										</div>
+									}
+									<div class="d-flex-column flex-column p-2">
+										<div>
+											<h1 class="MainText fw-bold">@eventDu.Name</h1>
+											<h4 class="sectionCardText mt-2">@eventDu.Description</h4>
+										</div>
+										<div class="DateOfEventText">
+											Дата проведения : @eventDu.DateOfEvent.Value.Day.@eventDu.DateOfEvent.Value.Month.@eventDu.DateOfEvent.Value.Year
+										</div>
+									</div>
+								</div>
+									<div class="d-flex">
+												<div class="sectionCard d-flex mt-2 flex-wrap justify-content-end p-2">
+													@foreach(var sectioni in eventDu.Sections)
+													{
+														<h6 class="sectionText p-2">@sectioni.Name</h6>
+													}
+											</div>
+									</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+		
+		
+}
+@if (_userInfo == null)
+{
+	<div class="d-flex flex-column justify-content-center align-items-center ">
+		<div class="registrationCard d-flex flex-column  align-items-center ">
+			<div class="MainText mb-2 mt-4">
+				Вы не авторизованы
+				<hr class="hrProfile" />
+			</div>
+			<div class="d-flex flex-column justify-content-center mt-4">
+				<a class="mb-2" href="/Registration">
+					<button class="CardButton">
+						Зарегистрироваться
+					</button>
+
+					<a href="/Login">
+						<button class="RegButton">
+							Войти
+						</button>
+					</a>
+				</a>
+			</div>
+		</div>
+	</div>
+
+}
+@code {
+	//private User _user;
+	private UserInfo? _userInfo;
+	private List<DUevent>? _events;
+	private List<Section> _sections { get; set; } = new List<Section>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (await _localStorage.ContainKeyAsync("user"))
+		{	
+			_userInfo = await _localStorage.GetItemAsync<UserInfo>("user");
+			if(_userInfo is not null)
+			{
+				_events = await _appDbContext.Events
+					.Include(e => e.Sections)
+					.Include(e => e.EventCondition)
+					.ToListAsync();
+
+					_sections = await _appDbContext.Sections.ToListAsync();
+			}
+			if (_userInfo is not null) 
+			{
+				var user = await _appDbContext.Users
+					.Include(u => u.Events)
+					.FirstOrDefaultAsync(u => u.Id == _userInfo.Id);
+				_events = user?.Events;
+			}
+		}
+		_localStorage.Changed += OnLocalStorageChanged;
+
+		await base.OnInitializedAsync();
+	}
+	private async Task Logouting()
+	{
+		await authService.LogoutAsync();
+	}
+	private async void OnLocalStorageChanged(object? sender, ChangedEventArgs e)
+	{
+		if (await _localStorage.ContainKeyAsync("user"))
+		{
+			_userInfo = await _localStorage.GetItemAsync<UserInfo>("user");
+		}
+		await InvokeAsync(StateHasChanged);
+	}
+}

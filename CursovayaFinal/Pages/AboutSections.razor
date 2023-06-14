@@ -1,0 +1,57 @@
+﻿@page "/AboutSections" 
+@using CursovayaFinal.Models
+@using CursovayaFinal.Sercives
+@using System.Security.Claims;
+@using Microsoft.EntityFrameworkCore
+@inject ILocalStorageService _localStorage;
+@inject IAuthService authService;
+@inject AppDbContext _appDbContext;
+
+<div class="d-flex justify-content-center">
+	<div class="d-flex">
+			@foreach(var sectioN in _appDbContext.Sections)
+			{
+				<div class="d-flex flex-column SectionCards align-items-center m-4">
+					<div>
+						<div class="fw-bold mt-2">@sectioN.Name</div>
+						<hr class="hrProfile" />
+					</div>
+					
+					
+					@if(sectioN.Name=="Культурный Сектор")
+					{
+						<div>
+							<img class="sectionPhotoClass m-2" style="object-fit: cover" src="https://sun9-38.userapi.com/impg/LZ3MKVZagqBPJbhbp4fEAtT58d74QzAb7XKwrg/kbsKL3MMbdk.jpg?size=1276x956&quality=96&sign=b2e813b836dd00e0eed1e54a2c5b49a9&type=album"/>
+						</div>
+						<div class="sectionCardText m-2 mb-2">
+							Это площадка, где студенты могут раскрыть свой творческий потенциал, встретиться с единомышленниками и насладиться разнообразными культурными мероприятиями
+						</div>
+					}
+					@if(sectioN.Name=="Спортивный Сектор")
+					{
+						<div>
+							<img class="sectionPhotoClass m-2" style="object-fit: cover" src="https://sun9-58.userapi.com/impf/c852128/v852128431/e4b8/vn1JgjEO74Q.jpg?size=2560x1920&quality=96&sign=0c4efe30cc85ac9ab7acba5349125f2c&type=album"/>
+						</div>
+						<div class="sectionCardText m-2 mb-2">
+							Это сектор, где студенты могут заниматься спортом, поддерживать активный образ жизни и развивать свои спортивные навыки
+						</div>
+					}
+					@if(sectioN.Name=="Ред.Коллегия")
+					{
+						<div>
+							<img class="sectionPhotoClass m-2" style="object-fit: cover" src="https://sun9-72.userapi.com/impg/j9Bgy8lGqn2evYuAHxxyRmLBr0QaBA1burYErA/ZIhp_TKtFxI.jpg?size=1396x1624&quality=95&sign=431b939dc8b39b11122d03945b82b7f3&type=album"/>
+						</div>
+						<div class="sectionCardText m-2 mb-2">
+							Творческое сообщество студентов, которые занимаются сбором, редактированием и публикацией разнообразных материалов. 
+						</div>
+					}
+
+				</div>
+			}
+	</div>
+</div>
+
+@code {
+	private string _description;
+
+}

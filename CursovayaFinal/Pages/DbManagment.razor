@@ -1,0 +1,58 @@
+﻿@page "/DbManagment"
+@using CursovayaFinal.Models;
+@using CursovayaFinal.Sercives;
+@using Microsoft.EntityFrameworkCore
+@inject IAuthService AuthService;
+@inject AppDbContext _appDbContext;
+@inject NavigationManager Navigation;
+<div class="d-flex m-2 justify-content-center">
+		<div class="d-flex flex-column justify-content-center align-items-center m-4">
+		<div class="registrationCard d-flex flex-column justify-content-between align-items-center p-2 mb-2">
+			<div class="d-flex flex-column align-items-center">
+				<input class="registrationInput mt-2 p-2" placeholder="Название" @bind-value="@_eventName" />
+				<input class="registrationInput mt-2 p-2" placeholder="Описание"@bind-value="@_eventDescription" />
+				<input class="registrationInput mt-2 p-2" placeholder="Состояние" @bind-value="@_eventCondition"/>
+				<input  class="registrationInput mt-2 p-2" placeholder="Дата" @bind-value="@_eventDate" />
+			</div>
+			<div class="d-flex mb-4">
+				<button class="registrationButton mt-4" @onclick="CreateEventDU">Добавить</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+@code {
+	private string _eventName;
+	private string _eventDescription;
+	private int _eventCondition;
+	private DateTime _eventDate;
+	private EventCondition eventCondition;
+	private string _eventNameDelete;
+	private async Task DeleteEvent()
+	{
+		await AuthService.DeleteEventAsync(_eventNameDelete);
+		Navigation.NavigateTo("/Main");
+	}
+	private async Task CreateEventDU()
+	{
+		eventCondition = await _appDbContext.Conditions.FirstOrDefaultAsync(ec => ec.Id == _eventCondition);
+		
+
+		DUevent _event = new DUevent()
+		{
+			Name = _eventName,
+			Description = _eventDescription,
+			EventCondition = eventCondition,
+			DateOfEvent = _eventDate
+	    };
+
+
+		await AuthService.AddEventAsync(_event);
+		Navigation.NavigateTo("/Main");
+
+	}
+
+
+}

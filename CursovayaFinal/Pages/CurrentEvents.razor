@@ -1,0 +1,74 @@
+﻿@page "/CurrentEvents"
+@using CursovayaFinal.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _dbContext;
+<div class="d-flex justify-content-center">
+	<h1>Активные мероприятия</h1>
+</div>
+<div class="d-flex justify-content-between flex-wrap ">
+	@foreach(var eventik in _events)
+	{
+		@if(eventik.EventCondition.Id==2)
+		{
+		<div class="eventCards mb-4">
+		  <div class="d-flex">
+			@if(eventik.Name=="Спартакиада")
+			{
+				<div>
+						<img class = "cardPhotoClass m-2" style="object-fit: cover" src="https://sun9-72.userapi.com/impg/5OFwPaaQzjkocMMOh_nDc3xBkVcry_jr0f9JWg/RZ1SyXzLUxc.jpg?size=2560x1920&quality=96&sign=62d83625747d2bb434ec78c43556c28f&type=album">
+				</div>
+			}
+			<div class="d-flex flex-column m-2">
+				<div>
+				<h1 class="MainText fw-bold  ">@eventik.Name</h1>
+				<h4 class="sectionCardText mt-2">@eventik.Description</h4>
+				</div>
+				<div class="DateOfEventText">
+				Дата проведения : @eventik.DateOfEvent.Value.Day.@eventik.DateOfEvent.Value.Month.@eventik.DateOfEvent.Value.Year
+				</div>
+				
+			</div>
+			
+			
+			
+		  </div>
+		  <div class="sectionCard d-flex mt-2 flex-wrap justify-content-end p-2">
+				@foreach(var sectioni in eventik.Sections)
+				{
+					<h6 class="sectionText p-2">@sectioni.Name</h6>
+				}
+		  </div>	
+			
+			
+		</div>
+		}
+		
+	}
+		
+	
+
+</div>
+@code {
+
+	private List<DUevent> _events { get; set; } = new List<DUevent>();
+	private List<Section> _sections { get; set; } = new List<Section>();
+	protected override async Task OnInitializedAsync()
+	{
+		_events = await _dbContext.Events
+			.Include(e => e.Sections)
+			.Include(e => e.EventCondition)
+			.ToListAsync();
+
+		_sections = await _dbContext.Sections.ToListAsync();
+		//foreach(var eventDU in _events)
+		//{
+		//	foreach(var section in _sections)
+		//	{
+		//		eventDU.Sections.Add(section);
+		//	}
+		//}
+
+		await base.OnInitializedAsync();
+	}
+}
+

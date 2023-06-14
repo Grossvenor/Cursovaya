@@ -1,0 +1,45 @@
+﻿@using CursovayaFinal.Models
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@page "/"
+@page "/Main"
+<PageTitle>Главная</PageTitle>
+<div class="d-flex justify-content-center align-items-center">
+	<div class="d-flex">
+		<div class="TimeCards d-flex flex-column justify-content-center align-items-center m-4 ">
+			<img class="mainPhotoClass" style="width:250px;border-radius:12px;object-fit: cover" src="/img/masterclass.jpg"/>
+			<p class="CardText">Прошедшие мероприятия</p>
+			<a href="/PastEvents">
+				<button class="CardButton">Подробнее</button>
+			</a>
+			
+		</div>
+		<div class="TimeCards d-flex flex-column justify-content-center align-items-center m-4 ">
+			<img class="mainPhotoClass" style="width:250px;border-radius:12px;object-fit: cover" src="/img/posvyat.jpg"/>
+			<p class="CardText">Текущие мероприятия</p>
+			<a href="/CurrentEvents">
+				<button class="CardButton">Подробнее</button>
+			</a>
+		</div>
+		<div class="TimeCards d-flex flex-column justify-content-center align-items-center m-4 ">
+			<img class="mainPhotoClass"  style="width:250px;border-radius:12px; object-fit: cover" src="/img/blagotvoritelnost.jpg"/>
+			<p class="CardText">Будущие мероприятия </p>
+			<a href="/FutureEvents">
+				<button class="CardButton">Подробнее</button>
+			</a>
+		</div>
+	</div>
+</div>
+
+
+@code {
+	//private User _user;
+	
+	protected override async Task OnInitializedAsync()
+	{
+	
+		await base.OnInitializedAsync();
+	}
+}
+
+

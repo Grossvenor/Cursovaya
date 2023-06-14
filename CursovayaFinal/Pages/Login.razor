@@ -1,0 +1,28 @@
+﻿@page "/Login"
+@using CursovayaFinal.Models
+@using CursovayaFinal.Sercives
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+	<h3>Войти</h3>
+	<div class="registrationCard d-flex flex-column justify-content-between align-items-center p-2 mb-2">
+		<div class="d-flex flex-column align-items-center mt-4">
+			<input class="registrationInput mt-2 p-2" placeholder="Логин" @bind-value="@_login"/>
+			<input type="password" class="registrationInput mt-2 p-2" placeholder="Пароль" @bind-value="@_password" />
+		</div>
+		<div class="d-flex mb-4">
+			<button class="LoginButton mt-4" @onclick="@LoginAsync">Войти</button>
+		</div>
+	</div>
+</div>
+@code {
+	private string _login;
+	private string _password;
+	public async void LoginAsync()
+	{
+		
+		await AuthService.LoginAsync(_login, _password);
+		Navigation.NavigateTo("/Profile");
+	}
+}

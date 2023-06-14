@@ -1,0 +1,97 @@
+﻿@using CursovayaFinal.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _dbContext;
+@inject ILocalStorageService _localStorage;
+
+<div class="top-row navbar navbar-dark p-0">
+	<div class="d-flex">
+		<a class="navbar-brand h-100 p-0" href="/Main">
+			<div class="d-flex align-items-center">
+				<div>
+					<img style="width:50px" src="img/kisspng-lion-tattoo-drawing-lion-sticker-5b50a5347e3812.972549781532011828517.png" alt="logo">
+				</div>
+				<div class="MainText">
+					Дом 3.1
+				</div>
+			</div>
+
+		</a>
+		<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+	<nav class="flex-column">
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="/Main" Match="NavLinkMatch.All">
+				<span class="oi oi-home" aria-hidden="true"></span> Главная
+			</NavLink>
+		</div>
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="/Profile" Match="NavLinkMatch.All">
+				<span class="oi oi-person" aria-hidden="true"></span> Профиль
+			</NavLink>
+		</div>
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="/AboutSections" Match="NavLinkMatch.All">
+				<span class="oi oi-clipboard" aria-hidden="true"></span> Секторы
+			</NavLink>
+		</div>
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="/StudSovet" Match="NavLinkMatch.All">
+				<span class="oi oi-people" aria-hidden="true"></span> Студ.совет
+			</NavLink>
+		</div>
+		@if (_userInfo is not null && _userInfo.RoleId == 2)
+		{
+			<div class="nav-item px-3">
+				<NavLink class="nav-link" href="/DbManagment" Match="NavLinkMatch.All">
+					<span class="oi oi-people" aria-hidden="true"></span> Управление данными
+				</NavLink>
+			</div>
+		}
+	</nav>
+</div>
+
+@code {
+	private UserInfo? _userInfo;
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender && _userInfo is null)
+		{
+			if (await _localStorage.ContainKeyAsync("user"))
+			{
+				var userInfo = await _localStorage.GetItemAsync<UserInfo>("user");
+			}
+
+			_localStorage.Changed += OnLocalStorageChanged;
+
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+
+	private bool collapseNavMenu = true;
+
+	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+	private void ToggleNavMenu()
+	{
+		collapseNavMenu = !collapseNavMenu;
+	}
+
+	private async void OnLocalStorageChanged(object? sender, ChangedEventArgs e)
+	{
+		if (await _localStorage.ContainKeyAsync("user"))
+		{
+			_userInfo = await _localStorage.GetItemAsync<UserInfo>("user");
+		}
+		else
+		{
+			_userInfo = null;
+		}
+		
+		await InvokeAsync(StateHasChanged);
+	}
+}

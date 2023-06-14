@@ -1,0 +1,108 @@
+﻿@page "/FutureEvents"
+@using CursovayaFinal.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _dbContext;
+@inject ILocalStorageService _localStorage;
+
+<div class="d-flex justify-content-center">
+	<h1>Будущие мероприятия</h1>
+</div>
+<div class="d-flex justify-content-between flex-wrap ">
+	@foreach(var eventik in _events)
+	{
+		@if(eventik.EventCondition.Id==3)
+		{
+		<div class="eventCards mb-4">
+		  <div class="d-flex">
+			<div class="d-flex flex-column p-2">
+				@if(eventik.Name=="Благотворительная Акция")
+									{
+										<div>
+											<img class = "cardPhotoClass m-2" style="object-fit: cover" src="https://sun9-20.userapi.com/impg/H6gwIjho8nkYYQxjY4o2sk-J6ZOckIZ5YL7fhA/IDu03Xi1W08.jpg?size=1919x1280&quality=95&sign=ceae2bf8c88fe05e8cb49d72208a021d&type=album">
+										</div>
+									}
+				@if (_user != null && _user.Events != null && _user.Events.Contains(eventik))
+						{
+							
+							<button class="CardButton" disabled>
+								Вы записаны
+							</button>
+
+						}
+						else
+						{
+							<a>
+							<button class="CardButton" @onclick="() => AddEventToProfile(eventik)">
+								Записаться
+							</button>
+							</a>
+						}
+
+			</div>
+			<div class="d-flex flex-column m-2">
+				<div>
+				<h1 class="sectionCardText fw-bold  ">@eventik.Name</h1>
+				<h4 class="mt-2">@eventik.Description</h4>
+				</div>
+				<div class="DateOfEventText">
+				Дата проведения : @eventik.DateOfEvent.Value.Day.@eventik.DateOfEvent.Value.Month.@eventik.DateOfEvent.Value.Year
+				</div>
+				
+			</div>
+			
+			
+			
+		  </div>
+		  <div class="sectionCard d-flex mt-2 flex-wrap justify-content-end p-2">
+				@foreach(var sectioni in eventik.Sections)
+				{
+					<h6 class="sectionText p-2">@sectioni.Name</h6>
+				}
+		  </div>	
+			
+			
+		</div>
+		}
+		
+	}
+		
+	
+
+</div>
+@code {
+
+	private User? _user;
+
+	private List<DUevent> _events { get; set; } = new List<DUevent>();
+	private List<Section> _sections { get; set; } = new List<Section>();
+	protected override async Task OnInitializedAsync()
+	{
+		_events = await _dbContext.Events
+			.Include(e => e.Sections)
+			.Include(e => e.EventCondition)
+			.ToListAsync();
+
+		_sections = await _dbContext.Sections.ToListAsync();
+
+		if (await _localStorage.ContainKeyAsync("user"))
+		{
+			var userInfo = await _localStorage.GetItemAsync<UserInfo>("user");
+			_user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userInfo.Id);
+		}
+		await base.OnInitializedAsync();
+	}
+	private async Task AddEventToProfile(DUevent eventik)
+	{
+		if (_user != null)
+		{
+			if (_user.Events == null)
+			{
+				_user.Events = new List<DUevent>();
+			}
+
+			_user.Events.Add(eventik);
+			await _dbContext.SaveChangesAsync();
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+}

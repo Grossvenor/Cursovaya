@@ -1,0 +1,67 @@
+﻿@page "/PastEvents"
+@using CursovayaFinal.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _dbContext;
+<div class="d-flex justify-content-center">
+	<h1>Прошедшие мероприятия</h1>
+</div>
+<div class="d-flex justify-content-between flex-wrap ">
+	@foreach(var eventik in _events)
+	{
+		@if(eventik.EventCondition.Id==1)
+		{
+		<div class="eventCards mb-4">
+		  <div class="d-flex">
+			@if(eventik.Name=="Кухня Народов")
+			{
+				<div>
+						<img class = "cardPhotoClass m-2" style="object-fit: cover" src="https://sun9-53.userapi.com/impg/otYD05pvhgQ4kOwFieMdPguJc94RhTsByNfBdw/ihH_FvsIb58.jpg?size=1276x956&quality=96&sign=09c71479746c26b60be61b9a9a807391&type=album">
+				</div>
+			}
+			<div class="d-flex flex-column m-2">
+				<div>
+				<h1 class="MainText fw-bold  ">@eventik.Name</h1>
+				<h4 class="sectionCardText mt-2">@eventik.Description</h4>
+				<div class="DateOfEventText">
+				Дата проведения : @eventik.DateOfEvent.Value.Day.@eventik.DateOfEvent.Value.Month.@eventik.DateOfEvent.Value.Year
+				</div>
+				</div>
+				
+			</div>
+			
+			
+			
+		  </div>
+		  <div class="sectionCard d-flex mt-2 flex-wrap justify-content-end p-2">
+				@foreach(var sectioni in eventik.Sections)
+				{
+					<h6 class="sectionText p-2">@sectioni.Name</h6>
+				}
+		  </div>	
+			
+			
+		</div>
+		}
+		
+	}
+		
+	
+
+</div>
+@code {
+
+	private List<DUevent> _events { get; set; } = new List<DUevent>();
+	private List<Section> _sections { get; set; } = new List<Section>();
+	protected override async Task OnInitializedAsync()
+	{
+		_events = await _dbContext.Events
+			.Include(e => e.Sections)
+			.Include(e => e.EventCondition)
+			.ToListAsync();
+
+		_sections = await _dbContext.Sections.ToListAsync();
+		
+
+		await base.OnInitializedAsync();
+	}
+}

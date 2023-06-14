@@ -1,0 +1,34 @@
+﻿@page "/Registration"
+@using CursovayaFinal.Models
+@using CursovayaFinal.Sercives
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+	<h3>Регистрация</h3>
+	<div class="registrationCard d-flex flex-column justify-content-between align-items-center p-2 mb-2">
+		<div class="d-flex flex-column align-items-center">
+			<input class="registrationInput mt-2 p-2" placeholder="Имя" @bind-value="@_name" />
+			<input class="registrationInput mt-2 p-2" placeholder="Фамилия"@bind-value="@_surname" />
+			<input class="registrationInput mt-2 p-2" placeholder="Логин" @bind-value="@_login"/>
+			<input class="registrationInput mt-2 p-2" placeholder="Пароль" @bind-value="@_password" />
+		</div>
+		<div class="d-flex mb-4">
+			<button class="registrationButton mt-4" @onclick="@Register">Зарегистрироваться</button>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	private string _name;
+	private string _surname;
+	private string _login;
+	private string _password;
+	public void Register()
+	{
+		RegistrationModel registrationModel = new RegistrationModel{Login=_login,Password=_password,Name=_name,Surname=_surname};
+		AuthService.RegisterAsync(registrationModel);
+		Navigation.NavigateTo("/Profile");
+	}
+}
